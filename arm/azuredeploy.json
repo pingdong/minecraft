@@ -28,7 +28,7 @@
         //    Combine default tag with custom tags
         "tags": "[union(variables('sharedTags'), parameters('tags'))]",
         // Storage Account
-        "storageAccount_name": "[concat(parameters('storageAccount_name'), substring(uniqueString(resourceGroup().id),0,3))]"
+        "storageAccount_name": "[concat(parameters('storageAccount_name'), substring(deployment().name,0,3))]"
     },
     "resources": [
         {
