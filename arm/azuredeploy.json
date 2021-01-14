@@ -91,6 +91,7 @@
                         // Storage Account
                         {
                             "type": "Microsoft.Storage/storageAccounts",
+                            "apiVersion": "2019-06-01",
                             "name": "[parameters('storageName')]",
                             "location": "[parameters('location')]",
                             "tags": "[parameters('tags')]",
@@ -110,6 +111,7 @@
                         },
                         {
                             "type": "Microsoft.Storage/storageAccounts/fileServices",
+                            "apiVersion": "2019-06-01",
                             "name": "[concat(parameters('storageName'), '/default')]",
                             "dependsOn": [
                                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
@@ -127,6 +129,7 @@
                         },
                         {
                             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+                            "apiVersion": "2019-06-01",
                             "name": "[concat(parameters('storageName'), '/default/', parameters('worlds')[copyIndex()])]",
                             "dependsOn": [
                                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageName'), 'default')]",
