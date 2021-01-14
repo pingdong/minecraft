@@ -26,7 +26,9 @@
         //    DefaultTag
         "sharedTags" : {},
         //    Combine default tag with custom tags
-        "tags": "[union(variables('sharedTags'), parameters('tags'))]"
+        "tags": "[union(variables('sharedTags'), parameters('tags'))]",
+        // Storage Account
+        "storageAccount_name": "[concat(parameters('storageAccount_name'), substring(uniqueString(resourceGroup().id),0,3))]"
     },
     "resources": [
         {
@@ -63,7 +65,7 @@
                         "value": "[variables('tags')]"
                     },
                     "storageName": {
-                        "value": "[concat(parameters('storageAccount_name'), substring(uniqueString(resourceGroup().id),0,3))]"
+                        "value": "[variables('storageAccount_name')]"
                     },
                     "worlds": {
                         "value": "[parameters('worlds')]"
