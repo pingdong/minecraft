@@ -1,0 +1,149 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "apiProfile": "2019-03-01-hybrid",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "australiaeast"
+        },
+        "tags": {
+            "type": "object",
+            "defaultValue": {}
+        },
+        "worlds": {
+            "type": "array"
+        },
+        "resourceGroup_name": {
+            "type": "string"
+        },
+        "storageAccount_name": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        // Tags
+        //    DefaultTag
+        "sharedTags" : {},
+        //    Combine default tag with custom tags
+        "tags": "[union(variables('sharedTags'), parameters('tags'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "location": "[parameters('location')]",
+            "name": "[parameters('resourceGroup_name')]",
+            "tags": "[variables('tags')]"
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('resourceGroup_name')]",
+            "name": "deployment",
+            "dependsOn": [
+                "[parameters('resourceGroup_name')]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "inner"    // Delay evaluation of the expression until that deployment begins.
+                                        // If not, listkeys() to get storage account access key fails
+
+                                        /* 
+                                        When scope is set to outer, you can't use the reference and list* function in the outputs section of a 
+                                        nested template for a resource you have deployed in the nested template. To return the values for a deployed
+                                        resource in a nested template, either use inner scope or convert your nested template to a linked template.
+                                        */
+                },
+                "mode": "Incremental",
+                // Since scope change to 'inner', 'global' parameters/variables won't work
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "tags": {
+                        "value": "[variables('tags')]"
+                    },
+                    "storageName": {
+                        "value": "[parameters('storageAccount_name')]"
+                    },
+                    "worlds": {
+                        "value": "[parameters('worlds')]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "apiProfile": "2019-03-01-hybrid",
+                    "parameters": {
+                        "location": {
+                            "type": "string"
+                        },
+                        "tags": {
+                            "type": "object"
+                        },
+                        "storageName": {
+                            "type": "string"
+                        },
+                        "worlds": {
+                            "type": "array"
+                        }
+                    },
+                    "resources": [
+                        // Storage Account
+                        {
+                            "type": "Microsoft.Storage/storageAccounts",
+                            "name": "[parameters('storageName')]",
+                            "location": "[parameters('location')]",
+                            "tags": "[parameters('tags')]",
+                            "kind": "StorageV2",
+                            "sku": {
+                                "name": "Standard_ZRS",
+                                "tier": "Standard"
+                            },
+                            "properties": {
+                                "accessTier": "Hot",
+                                "largeFileSharesState": "Enabled",
+                                "networkAcls": {
+                                    "bypass": "AzureServices",
+                                    "defaultAction": "Allow"
+                                }
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Storage/storageAccounts/fileServices",
+                            "name": "[concat(parameters('storageName'), '/default')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                            ],
+                            "sku": {
+                                "name": "Standard_ZRS",
+                                "tier": "Standard"
+                            },
+                            "properties": {
+                                "shareDeleteRetentionPolicy": {
+                                    "enabled": false,          // <--  Enabled in prod
+                                    "days": 14
+                                }
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+                            "name": "[concat(parameters('storageName'), '/default/', parameters('worlds')[copyIndex()])]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageName'), 'default')]",
+                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                            ],
+                            "properties": {
+                                "shareQuota": 1024
+                            },
+                            "copy": {
+                                "name": "worlds",
+                                "count": "[length(parameters('worlds'))]",
+                                "mode": "parallel"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

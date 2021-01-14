@@ -1,0 +1,27 @@
+trigger: none
+pr: none
+
+variables:
+- group: Pipeline
+
+stages:
+# Management Resource
+- stage: Deploy
+  displayName: Deploy
+  jobs:
+  - job: DeployInstances
+    displayName: Deploy Instances
+    pool:
+      poolImage: $(pipeline#vmImage)
+    workspace:
+      clean: all
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploying
+      inputs:
+        deploymentScope: Subscription
+        connectedServiceName: $(pipeline#azure.subscription)
+        subscriptionId: $(pipeline#azure.subscription.id)
+        location: $(pipeline#azure.location)
+        csmFile: ./arm/azuredeploy.json
+        csmParametersFile: ./arm/azuredeploy.parameters.json
