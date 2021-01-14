@@ -136,7 +136,8 @@
                                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
                             ],
                             "properties": {
-                                "shareQuota": 1024
+                                "shareQuota": 1024,
+                                "accessTier": "Hot"
                             },
                             "copy": {
                                 "name": "worlds",
