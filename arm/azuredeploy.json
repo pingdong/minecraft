@@ -63,7 +63,7 @@
                         "value": "[variables('tags')]"
                     },
                     "storageName": {
-                        "value": "[parameters('storageAccount_name')]"
+                        "value": "[concat(parameters('storageAccount_name'), substring(uniqueString(resourceGroup().id),0,3))]"
                     },
                     "worlds": {
                         "value": "[parameters('worlds')]"
