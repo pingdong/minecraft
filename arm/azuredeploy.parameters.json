@@ -9,7 +9,7 @@
             "value": "Minecraft"
         },
         "storageAccount_name": {
-            "value": "[concat('stminecraft', uniqueString(resourceGroup().id))]"
+            "value": "[concat('stminecraft', substring(uniqueString(resourceGroup().id),0,3))]"
         },
         "tags": {
             "value": { 
