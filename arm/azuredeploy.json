@@ -3,21 +3,41 @@
     "contentVersion": "1.0.0.0",
     "apiProfile": "2019-03-01-hybrid",
     "parameters": {
-        "location": {
-            "type": "string",
-            "defaultValue": "australiaeast"
-        },
         "tags": {
             "type": "object",
             "defaultValue": {}
         },
-        "worlds": {
-            "type": "array"
+        "location": {
+            "type": "string",
+            "defaultValue": "australiaeast"
         },
         "resourceGroup_name": {
             "type": "string"
         },
-        "storageAccount_name": {
+        "storageAccount_prefix": {
+            "type": "string"
+        },
+        "containerInstance_name": {
+            "type": "string"
+        },
+        "containerInstance_cpuCores": {
+            "type": "int",
+            "defaultValue": 1
+        },
+        "containerInstance_memoryInGB": {
+            "type": "string",
+            "defaultValue": "1.5"
+        },
+        "minecraft_image": {
+            "type": "string"
+        },
+        "minecraft_settings": {
+            "type": "array"
+        },
+        "minecraft_worldName": {
+            "type": "string"
+        },
+        "minecraft_dnsPrefix": {
             "type": "string"
         }
     },
@@ -28,11 +48,12 @@
         //    Combine default tag with custom tags
         "tags": "[union(variables('sharedTags'), parameters('tags'))]",
         // Storage Account
-        "storageAccount_name": "[concat(parameters('storageAccount_name'), substring(deployment().name,0,3))]"
+        "storageAccount_name": "[concat(parameters('storageAccount_prefix'), substring(deployment().name,0,3))]"
     },
     "resources": [
         {
             "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2020-10-01",
             "location": "[parameters('location')]",
             "name": "[parameters('resourceGroup_name')]",
             "tags": "[variables('tags')]"
@@ -40,7 +61,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('resourceGroup_name')]",
-            "name": "deployment",
+            "name": "[concat('MCSDeployment', parameters('minecraft_worldName'))]",
             "dependsOn": [
                 "[parameters('resourceGroup_name')]"
             ],
@@ -64,11 +85,29 @@
                     "tags": {
                         "value": "[variables('tags')]"
                     },
-                    "storageName": {
+                    "storageAccount_name": {
                         "value": "[variables('storageAccount_name')]"
                     },
-                    "worlds": {
-                        "value": "[parameters('worlds')]"
+                    "containerInstance_name": {
+                        "value": "[parameters('containerInstance_name')]"
+                    },
+                    "containerInstance_cpuCores": {
+                        "value": "[parameters('containerInstance_cpuCores')]"
+                    },
+                    "containerInstance_memoryInGB": {
+                        "value": "[parameters('containerInstance_memoryInGB')]"
+                    },
+                    "minecraft_image": {
+                        "value": "[parameters('minecraft_image')]"
+                    },
+                    "minecraft_settings": {
+                        "value": "[parameters('minecraft_settings')]"
+                    },
+                    "minecraft_worldName": {
+                        "value": "[parameters('minecraft_worldName')]"
+                    },
+                    "minecraft_dnsPrefix": {
+                        "value": "[parameters('minecraft_dnsPrefix')]"
                     }
                 },
                 "template": {
@@ -82,19 +121,53 @@
                         "tags": {
                             "type": "object"
                         },
-                        "storageName": {
+                        "storageAccount_name": {
                             "type": "string"
                         },
-                        "worlds": {
+                        "containerInstance_name": {
+                            "type": "string"
+                        },
+                        "containerInstance_cpuCores": {
+                            "type": "int"
+                        },
+                        "containerInstance_memoryInGB": {
+                            "type": "string"
+                        },
+                        "minecraft_image": {
+                            "type": "string"
+                        },
+                        "minecraft_settings": {
                             "type": "array"
+                        },
+                        "minecraft_worldName": {
+                            "type": "string"
+                        },
+                        "minecraft_dnsPrefix": {
+                            "type": "string"
                         }
+                    },
+                    "variables": {
+                        "storageAccount_shareName": "[concat(parameters('storageAccount_name'), '/default/', parameters('minecraft_worldName'))]",
+                        "storageAccount_id": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount_name'))]",
+                        "containerInstance_ports": [
+                            {
+                                "port": 19132,
+                                "protocol": "UDP"
+                            }
+                        ],
+                        "minecraft_sharedSettings": [{
+                            "name": "EULA",
+                            "value": "TRUE"
+                        }],
+                        "minecraft_settings": "[union(variables('minecraft_sharedSettings'), parameters('minecraft_settings'))]",
+                        "minecraft_dnsName": "[concat(parameters('minecraft_dnsPrefix'), parameters('minecraft_worldName'))]"
                     },
                     "resources": [
                         // Storage Account
                         {
                             "type": "Microsoft.Storage/storageAccounts",
                             "apiVersion": "2019-06-01",
-                            "name": "[parameters('storageName')]",
+                            "name": "[parameters('storageAccount_name')]",
                             "location": "[parameters('location')]",
                             "tags": "[parameters('tags')]",
                             "kind": "StorageV2",
@@ -114,9 +187,9 @@
                         {
                             "type": "Microsoft.Storage/storageAccounts/fileServices",
                             "apiVersion": "2019-06-01",
-                            "name": "[concat(parameters('storageName'), '/default')]",
+                            "name": "[concat(parameters('storageAccount_name'), '/default')]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount_name'))]"
                             ],
                             "sku": {
                                 "name": "Standard_ZRS",
@@ -132,19 +205,62 @@
                         {
                             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
                             "apiVersion": "2019-06-01",
-                            "name": "[concat(parameters('storageName'), '/default/', parameters('worlds')[copyIndex()])]",
+                            "name": "[variables('storageAccount_shareName')]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageName'), 'default')]",
-                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccount_name'), 'default')]",
+                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount_name'))]"
                             ],
                             "properties": {
                                 "shareQuota": 1024,
                                 "accessTier": "Hot"
-                            },
-                            "copy": {
-                                "name": "worlds",
-                                "count": "[length(parameters('worlds'))]",
-                                "mode": "parallel"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.ContainerInstance/containerGroups",
+                            "apiVersion": "2019-12-01",
+                            "name": "[parameters('containerInstance_name')]",
+                            "location": "[parameters('location')]",
+                            "tags": "[parameters('tags')]",
+                            "properties": {
+                                "containers": [
+                                    {
+                                        "name": "[parameters('containerInstance_name')]",
+                                        "properties": {
+                                            "image": "[parameters('minecraft_image')]",
+                                            "resources": {
+                                                "requests": {
+                                                    "cpu": "[int(parameters('containerInstance_cpuCores'))]",
+                                                    "memoryInGB": "[float(parameters('containerInstance_memoryInGB'))]"
+                                                }
+                                            },
+                                            "environmentVariables": "[variables('minecraft_settings')]",
+                                            "ports": "[variables('containerInstance_ports')]",
+                                            "volumeMounts": [
+                                                {
+                                                "name": "filesharevolume",
+                                                "mountPath": "/data"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "restartPolicy": "OnFailure",
+                                "osType": "Linux",
+                                "ipAddress": {
+                                    "type": "Public",
+                                    "ports": "[variables('containerInstance_ports')]",
+                                    "dnsNameLabel": "[variables('minecraft_dnsName')]"
+                                },
+                                "volumes": [
+                                    {
+                                        "name": "filesharevolume",
+                                        "azureFile": {
+                                            "shareName": "[variables('storageAccount_shareName')]",
+                                            "storageAccountName": "[parameters('storageAccount_name')]",
+                                            "storageAccountKey": "[listKeys(variables('storageAccount_id'), '2019-06-01').keys[0].value]"
+                                        }
+                                    }
+                                ]
                             }
                         }
                     ]

@@ -1,21 +1,46 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "worlds": {
-            "value": ["chelsea"]
-        },
-        "resourceGroup_name": {
-            "value": "Minecraft"
-        },
-        "storageAccount_name": {
-            "value": "stminecraft"
-        },
+    "parameters": {        
         "tags": {
             "value": { 
                 "owner": "Ping",
                 "app": "Bedrock" 
             }
+        },
+        
+        
+        "resourceGroup_name": {
+            "value": "Minecraft"
+        },
+        "storageAccount_prefix": {
+            "value": "stminecraft"
+        },
+        "containerInstance_name": {
+            "value": "aci-minecraft" 
+        },
+
+
+        "minecraft_image": {
+            "value": "itzg/minecraft-bedrock-server:latest"
+        },
+        "minecraft_settings": {
+            "value": [
+                {
+                    "name": "GAMEMODE",
+                    "value": "survival"
+                },
+                {
+                    "name": "DIFFICULTY",
+                    "value": "normal"
+                }
+            ]
+        },
+        "minecraft_worldName": {
+            "value": "chelsea"
+        },
+        "minecraft_dnsPrefix": {
+            "value": "mcs"
         }
     }
 }
