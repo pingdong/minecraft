@@ -219,6 +219,11 @@
                             "type": "Microsoft.ContainerInstance/containerGroups",
                             "apiVersion": "2019-12-01",
                             "name": "[parameters('containerInstance_name')]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('storageAccount_shareName'))]",
+                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccount_name'), 'default')]",
+                                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount_name'))]"
+                            ],
                             "location": "[parameters('location')]",
                             "tags": "[parameters('tags')]",
                             "properties": {
