@@ -220,7 +220,6 @@
                             "apiVersion": "2019-12-01",
                             "name": "[parameters('containerInstance_name')]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', parameters('storageAccount_name'), '/default/', parameters('minecraft_worldName'))]",
                                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccount_name'), 'default')]",
                                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccount_name'))]"
                             ],
