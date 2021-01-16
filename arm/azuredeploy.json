@@ -259,7 +259,7 @@
                                     {
                                         "name": "filesharevolume",
                                         "azureFile": {
-                                            "shareName": "[variables('storageAccount_shareName')]",
+                                            "shareName": "[parameters('minecraft_worldName')]",
                                             "storageAccountName": "[parameters('storageAccount_name')]",
                                             "storageAccountKey": "[listKeys(variables('storageAccount_id'), '2019-06-01').keys[0].value]"
                                         }
