@@ -24,18 +24,6 @@
         "minecraft_image": {
             "value": "itzg/minecraft-bedrock-server:latest"
         },
-        "minecraft_settings": {
-            "value": [
-                {
-                    "name": "GAMEMODE",
-                    "value": "creative"
-                },
-                {
-                    "name": "DIFFICULTY",
-                    "value": "peaceful"
-                }
-            ]
-        },
         "minecraft_worldName": {
             "value": "chelsea"
         },
