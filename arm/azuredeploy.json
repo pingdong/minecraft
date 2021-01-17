@@ -213,6 +213,7 @@
                                 "accessTier": "Hot"
                             }
                         },
+                        // Container Instances
                         {
                             "type": "Microsoft.ContainerInstance/containerGroups",
                             "apiVersion": "2019-12-01",
