@@ -28,11 +28,11 @@
             "value": [
                 {
                     "name": "GAMEMODE",
-                    "value": "survival"
+                    "value": "creative"
                 },
                 {
                     "name": "DIFFICULTY",
-                    "value": "normal"
+                    "value": "peaceful"
                 }
             ]
         },
