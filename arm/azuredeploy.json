@@ -32,7 +32,8 @@
             "type": "string"
         },
         "minecraft_settings": {
-            "type": "array"
+            "type": "array",
+            "defaultValue": []
         },
         "minecraft_worldName": {
             "type": "string"
