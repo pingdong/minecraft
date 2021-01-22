@@ -16,8 +16,8 @@
         "storageAccount_prefix": {
             "value": "stminecraft"
         },
-        "containerInstance_name": {
-            "value": "aci-minecraft" 
+        "servicePlan_name": {
+            "value": "asp-minecraft" 
         },
 
 
@@ -26,9 +26,6 @@
         },
         "minecraft_worldName": {
             "value": "chelsea"
-        },
-        "minecraft_dnsPrefix": {
-            "value": "mcs"
         }
     }
 }
