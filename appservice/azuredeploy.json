@@ -198,14 +198,14 @@
                             "properties": {
                                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan_name'))]",
                                 "siteConfig": {
-                                    "name": "[concat('ap-', parameters('minecraft_worldName'), '-cfg')]",
+                                    "name": "[concat('ap-', parameters('minecraft_worldName'))]",
                                     "appSettings": [
                                         {
                                             "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
                                             "value": "false"
                                         }
                                     ],
-                                    "linuxFxVersion": "[concat('DOCKER|', parameters('minecraft_image'))]"
+                                    "linuxFxVersion": "DOCKER|itzg/minecraft-bedrock-server:latest"
                                 }
                             }
                         }
