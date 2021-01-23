@@ -183,7 +183,9 @@
                             "sku": {
                                 "name": "[parameters('servicePlan_sku')]"
                             },
-                            "properties": {}
+                            "properties": {
+                                "reserved": true
+                            }
                         },
                         {
                             "type": "Microsoft.Web/sites",
@@ -199,13 +201,7 @@
                                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan_name'))]",
                                 "siteConfig": {
                                     "name": "[concat('ap-', parameters('minecraft_worldName'))]",
-                                    "appSettings": [
-                                        {
-                                            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
-                                            "value": "false"
-                                        }
-                                    ],
-                                    "linuxFxVersion": "DOCKER|itzg/minecraft-bedrock-server:latest"
+                                    "linuxFxVersion": "[concat('DOCKER|', parameters('minecraft_image'))]"
                                 }
                             }
                         }
