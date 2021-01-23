@@ -211,7 +211,7 @@
                             },
                             "copy": {
                                 "name": "world_name",
-                                "count": "[parameters('minecraft_worlds')]"
+                                "count": "[length(parameters('minecraft_worlds'))]"
                             }
                         },
                         // Container Instances
@@ -269,7 +269,7 @@
                             },
                             "copy": {
                                 "name": "world_name",
-                                "count": "[parameters('minecraft_worlds')]"
+                                "count": "[length(parameters('minecraft_worlds'))]"
                             }
                         }
                     ]
