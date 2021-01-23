@@ -20,6 +20,10 @@
         "servicePlan_name": {
             "type": "string"
         },
+        "servicePlan_sku": {
+            "type": "string",
+            "defaultValue": "B1"
+        },
         "minecraft_image": {
             "type": "string"
         },
@@ -74,6 +78,9 @@
                     "servicePlan_name": {
                         "value": "[parameters('servicePlan_name')]"
                     },
+                    "servicePlan_sku": {
+                        "value": "[parameters('servicePlan_sku')]"
+                    },
                     "minecraft_image": {
                         "value": "[parameters('minecraft_image')]"
                     },
@@ -93,6 +100,9 @@
                             "type": "string"
                         },
                         "servicePlan_name": {
+                            "type": "string"
+                        },
+                        "servicePlan_sku": {
                             "type": "string"
                         },
                         "minecraft_image": {
@@ -171,8 +181,7 @@
                             ],
                             "kind": "linux",
                             "sku": {
-                                "tier": "Standard",
-                                "name": "S1"
+                                "name": "[parameters('servicePlan_sku')]"
                             },
                             "properties": {}
                         },
@@ -187,17 +196,17 @@
                             ],
                             "kind": "app,linux,container",
                             "properties": {
+                                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan_name'))]",
                                 "siteConfig": {
                                     "name": "[parameters('minecraft_worldName')]",
                                     "appSettings": [
                                         {
-                                        "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
-                                        "value": "false"
+                                            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+                                            "value": "false"
                                         }
                                     ],
                                     "linuxFxVersion": "[concat('DOCKER|', parameters('minecraft_image'))]"
-                                },
-                                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan_name'))]"
+                                }
                             }
                         }
                     ]
