@@ -12,7 +12,7 @@ stages:
   - job: DeployInstances
     displayName: Deploy Instances
     pool:
-      poolImage: $(pipeline#vmImage)
+      vmImage: $(pipeline#vmImage)
     workspace:
       clean: all
     steps:
