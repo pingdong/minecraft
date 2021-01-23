@@ -83,9 +83,6 @@
                 "mode": "Incremental",
                 // Since scope change to 'inner', 'global' parameters/variables won't work
                 "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
                     "tags": {
                         "value": "[variables('tags')]"
                     },
