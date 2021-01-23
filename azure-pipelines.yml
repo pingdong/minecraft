@@ -23,5 +23,5 @@ stages:
         connectedServiceName: $(pipeline#azure.subscription)
         subscriptionId: $(pipeline#azure.subscription.id)
         location: $(pipeline#azure.location)
-        csmFile: ./appservice/azuredeploy.json
-        csmParametersFile: ./appservice/azuredeploy.parameters.json
+        csmFile: azuredeploy.json
+        csmParametersFile: ./chelsea/azuredeploy.parameters.json
