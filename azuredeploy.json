@@ -65,6 +65,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[parameters('resourceGroup_name')]",
+            "name": "Minecraft-Server-Deployment",
             "dependsOn": [
                 "[parameters('resourceGroup_name')]"
             ],
