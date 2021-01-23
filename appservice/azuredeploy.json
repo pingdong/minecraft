@@ -188,7 +188,7 @@
                         {
                             "type": "Microsoft.Web/sites",
                             "apiVersion": "2018-02-01",
-                            "name": "[parameters('minecraft_worldName')]",
+                            "name": "[concat('ap-', parameters('minecraft_worldName'))]",
                             "location": "[resourceGroup().location]",
                             "tags": "[parameters('tags')]",
                             "dependsOn": [
@@ -198,7 +198,7 @@
                             "properties": {
                                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlan_name'))]",
                                 "siteConfig": {
-                                    "name": "[parameters('minecraft_worldName')]",
+                                    "name": "[concat('ap-', parameters('minecraft_worldName'), '-cfg')]",
                                     "appSettings": [
                                         {
                                             "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
