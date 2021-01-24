@@ -7,7 +7,7 @@
             "type": "object",
             "defaultValue": { 
                 "owner": "Ping",
-                "app": "Bedrock" 
+                "app": "Minecraft Bedrock" 
             }
         },
         "location": {
@@ -173,9 +173,10 @@
                             "properties": {
                                 "accessTier": "Hot",
                                 "largeFileSharesState": "Enabled",
+                                "allowBlobPublicAccess": false,
                                 "networkAcls": {
                                     "bypass": "AzureServices",
-                                    "defaultAction": "Allow"
+                                    "defaultAction": "Deny"
                                 }
                             }
                         },
