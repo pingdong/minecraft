@@ -176,7 +176,7 @@
                                 "allowBlobPublicAccess": false,
                                 "networkAcls": {
                                     "bypass": "AzureServices",
-                                    "defaultAction": "Deny"
+                                    "defaultAction": "Allow"
                                 }
                             }
                         },
