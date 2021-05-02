@@ -134,6 +134,10 @@
                         "storageAccount_name": {
                             "type": "string"
                         },
+                        "connections_aci_name": {
+                            "defaultValue": "aci",
+                            "type": "String"
+                        },
                         "logicApp_start_name": {
                             "type": "string"
                         },
@@ -295,185 +299,24 @@
                                 "count": "[length(parameters('minecraft_worlds'))]"
                             }
                         },
-                        // Logic App
-                        //   Logic App - Start
+                        // Logic App   
+                        //    API Connection                     
                         {
-                            "type": "Microsoft.Logic/workflows",
-                            "apiVersion": "2017-07-01",
-                            "name": "[parameters('logicApp_start_name')]",
+                            "type": "Microsoft.Web/connections",
+                            "apiVersion": "2016-06-01",
                             "location": "[resourceGroup().location]",
-                            "tags": "[parameters('tags')]",
-                            "dependsOn": ["world_name"],
+                            "name": "[parameters('connections_aci_name')]",
+                            "kind": "V1",
                             "properties": {
-                                "state": "Enabled",
-                                "definition": {
-                                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                                    "contentVersion": "1.0.0.0",
-                                    "parameters": {
-                                        "$connections": {
-                                            "defaultValue": {},
-                                            "type": "Object"
-                                        },
-                                        "subscriptionId": {
-                                            "type": "string"
-                                        },
-                                        "location": {
-                                            "type": "string"
-                                        },
-                                        "container": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "triggers": {
-                                        "Recurrence": {
-                                            "recurrence": {
-                                                "frequency": "Day",
-                                                "interval": 1,
-                                                "schedule": {
-                                                    "hours": [
-                                                        "16"
-                                                    ]
-                                                },
-                                                "timeZone": "New Zealand Standard Time"
-                                            },
-                                            "type": "Recurrence"
-                                        }
-                                    },
-                                    "actions": {
-                                        "Start_containers_in_a_container_group": {
-                                            "runAfter": {},
-                                            "type": "ApiConnection",
-                                            "inputs": {
-                                                "host": {
-                                                    "connection": {
-                                                        "name": "@parameters('$connections')['aci']['connectionId']"
-                                                    }
-                                                },
-                                                "method": "post",
-                                                "path": "/subscriptions/@{encodeURIComponent(parameters('subscriptionId'))}/resourceGroups/@{encodeURIComponent(parameters('location'))}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(parameters('container'))}/start",
-                                                "queries": {
-                                                    "x-ms-api-version": "2019-12-01"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "outputs": {}
-                                },
-                                "parameters": {
-                                    "$connections": {
-                                        "value": {
-                                            "aci": {
-                                                "connectionId": "[parameters('connections_aci_externalid')]",
-                                                "connectionName": "aci",
-                                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, 'managedApis/aci')]"
-                                            }
-                                        }
-                                    },
-                                    "subscriptionId": {
-                                        "value": "[subscription().id]"
-                                    },
-                                    "location": {
-                                        "value": "[resourceGroup().name]"
-                                    },
-                                    "container": {
-                                        "value": "[parameters('minecraft_worlds')[copyIndex()]]"
-                                    }
+                                "displayName": "Azure Container Instance",
+                                "customParameterValues": {},
+                                "api": {
+                                    "id": "[concat('/subscriptions/', subscription().id , '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', parameters('connections_aci_name'))]"
                                 }
-                            },
-                            "copy": {
-                                "name": "time_start",
-                                "count": "[length(parameters('minecraft_worlds'))]"
-                            }
-                        },
-                        //   Logic App - Stop
-                        {
-                            "type": "Microsoft.Logic/workflows",
-                            "apiVersion": "2017-07-01",
-                            "name": "[parameters('logicApp_stop_name')]",
-                            "location": "[resourceGroup().location]",
-                            "tags": "[parameters('tags')]",
-                            "dependsOn": ["world_name"],
-                            "properties": {
-                                "state": "Enabled",
-                                "definition": {
-                                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                                    "contentVersion": "1.0.0.0",
-                                    "parameters": {
-                                        "$connections": {
-                                            "defaultValue": {},
-                                            "type": "Object"
-                                        },
-                                        "subscriptionId": {
-                                            "type": "string"
-                                        },
-                                        "location": {
-                                            "type": "string"
-                                        },
-                                        "container": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "triggers": {
-                                        "Recurrence": {
-                                            "recurrence": {
-                                                "frequency": "Day",
-                                                "interval": 1,
-                                                "schedule": {
-                                                    "hours": [
-                                                        "16"
-                                                    ]
-                                                },
-                                                "timeZone": "New Zealand Standard Time"
-                                            },
-                                            "type": "Recurrence"
-                                        }
-                                    },
-                                    "actions": {
-                                        "Stop_containers_in_a_container_group": {
-                                            "runAfter": {},
-                                            "type": "ApiConnection",
-                                            "inputs": {
-                                                "host": {
-                                                    "connection": {
-                                                        "name": "@parameters('$connections')['aci']['connectionId']"
-                                                    }
-                                                },
-                                                "method": "post",
-                                                "path": "/subscriptions/@{encodeURIComponent(parameters('subscriptionId'))}/resourceGroups/@{encodeURIComponent(parameters('location'))}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(parameters('container'))}/stop",
-                                                "queries": {
-                                                    "x-ms-api-version": "2019-12-01"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "outputs": {}
-                                },
-                                "parameters": {
-                                    "$connections": {
-                                        "value": {
-                                            "aci": {
-                                                "connectionId": "[parameters('connections_aci_externalid')]",
-                                                "connectionName": "aci",
-                                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, 'managedApis/aci')]"
-                                            }
-                                        }
-                                    },
-                                    "subscriptionId": {
-                                        "value": "[subscription().id]"
-                                    },
-                                    "location": {
-                                        "value": "[resourceGroup().name]"
-                                    },
-                                    "container": {
-                                        "value": "[parameters('minecraft_worlds')[copyIndex()]]"
-                                    }
-                                }
-                            },
-                            "copy": {
-                                "name": "time_stop",
-                                "count": "[length(parameters('minecraft_worlds'))]"
                             }
                         }
+                        //   Logic App - Start
+                        //   Logic App - Stop
                     ]
                 }
             }
