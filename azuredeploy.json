@@ -102,7 +102,7 @@
                         "value": "[parameters('logicApp_stop_name')]"
                     },
                     "containerInstance_prefix": {
-                        "value": "[parameters('logicApp_stop_name')]"
+                        "value": "[parameters('containerInstance_prefix')]"
                     },
                     "containerInstance_cpuCores": {
                         "value": "[parameters('containerInstance_cpuCores')]"
