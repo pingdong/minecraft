@@ -346,28 +346,30 @@
                                             "type": "Recurrence"
                                         }
                                     },
-                                    "actions": {
-                                        "Start_containers_in_a_container_group": {
-                                            "runAfter": {},
-                                            "type": "ApiConnection",
-                                            "inputs": {
-                                                "host": {
-                                                    "connection": {
-                                                        "name": "@parameters('connectionId')"
+                                    "copy": [
+                                        {
+                                            "name": "actions",
+                                            "count": "[parameters('minecraft_worlds')]",
+                                            "input": {
+                                                "Start_containers_in_a_container_group": {
+                                                    "runAfter": {},
+                                                    "type": "ApiConnection",
+                                                    "inputs": {
+                                                        "host": {
+                                                            "connection": {
+                                                                "name": "@parameters('connectionId')"
+                                                            }
+                                                        },
+                                                        "method": "post",
+                                                        "path": "[concat('/subscriptions/@{encodeURIComponent(', subscription().id, ')}/resourceGroups/@{encodeURIComponent(', resourceGroup().name, ')}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(', parameters('minecraft_worlds')[copyIndex()], ')}/start')]",
+                                                        "queries": {
+                                                            "x-ms-api-version": "2019-12-01"
+                                                        }
                                                     }
-                                                },
-                                                "method": "post",
-                                                "path": "[concat('/subscriptions/@{encodeURIComponent(', subscription().id, ')}/resourceGroups/@{encodeURIComponent(', resourceGroup().name, ')}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(', parameters('minecraft_worlds')[copyIndex()], ')}/start')]",
-                                                "queries": {
-                                                    "x-ms-api-version": "2019-12-01"
                                                 }
                                             }
-                                        },
-                                        "copy": {
-                                            "name": "aci_start",
-                                            "count": "[length(parameters('minecraft_worlds'))]"
                                         }
-                                    },
+                                    ],
                                     "outputs": {}
                                 },
                                 "parameters": {
