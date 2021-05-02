@@ -361,7 +361,7 @@
                                                             }
                                                         },
                                                         "method": "post",
-                                                        "path": "[concat('/subscriptions/@{encodeURIComponent(', subscription().id, ')}/resourceGroups/@{encodeURIComponent(', resourceGroup().name, ')}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(', parameters('minecraft_worlds')[copyIndex()], ')}/start')]",
+                                                        "path": "[concat('/subscriptions/@{encodeURIComponent(', subscription().id, ')}/resourceGroups/@{encodeURIComponent(', resourceGroup().name, ')}/providers/Microsoft.ContainerInstance/containerGroups/@{encodeURIComponent(', parameters('minecraft_worlds')[copyIndex('actions')], ')}/start')]",
                                                         "queries": {
                                                             "x-ms-api-version": "2019-12-01"
                                                         }
