@@ -5,6 +5,12 @@
         "storageAccount_name": {
             "value": "stminecraftdata"
         },
+        "logicApp_start_name": {
+            "value": "la-minecraft-start"
+        },
+        "logicApp_stop_name": {
+            "value": "la-minecraft-stop"
+        },
         "containerInstance_prefix": {
             "value": "aci-minecraft-"
         },
