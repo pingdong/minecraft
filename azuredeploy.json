@@ -349,7 +349,7 @@
                                     "copy": [
                                         {
                                             "name": "actions",
-                                            "count": "[parameters('minecraft_worlds')]",
+                                            "count": "[length(parameters('minecraft_worlds'))]",
                                             "input": {
                                                 "Start_containers_in_a_container_group": {
                                                     "runAfter": {},
