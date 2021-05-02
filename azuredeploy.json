@@ -309,9 +309,8 @@
                             "kind": "V1",
                             "properties": {
                                 "displayName": "Azure Container Instance",
-                                "customParameterValues": {},
                                 "api": {
-                                    "id": "[concat('/subscriptions/', subscription().id , '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', parameters('connections_aci_name'))]"
+                                    "id": "[concat(subscription().id , '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', parameters('connections_aci_name'))]"
                                 }
                             }
                         }
