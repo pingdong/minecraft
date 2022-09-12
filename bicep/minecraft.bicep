@@ -7,7 +7,6 @@
 param project string
 
 param worlds array
-param settings array
 
 // Resource Related Parameters
 @minLength(3)
