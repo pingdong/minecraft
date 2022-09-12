@@ -4,17 +4,17 @@ targetScope = 'subscription'
 // *     Parameters     *
 // **********************
 
-// Project Related Parameters
+@minLength(3)
+param project string
+
 @minLength(3)
 param resourceGroupName string
-
-// Resource Related Parameters
 @minLength(3)
 param location string
 
 @description('Default Resource Tags')
 param defaultTags object = {
-  project: resourceGroupName
+  project: project
   owner: 'Ping Dong'
 }
 

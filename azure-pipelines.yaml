@@ -6,7 +6,12 @@ variables:
 
 - name: resourceGroupArtifactName
   value: resourceGroup
+- name: resourceArtifactName
+  value: minecraft
+
 - name: resourceGroupName
+  value: minecraft
+- name: project
   value: minecraft
 
 stages:
@@ -31,8 +36,19 @@ stages:
         location: $(pipeline#azure.location)
         workingDirectory: ${{ variables.workingDirectory }}
         artifactName: ${{ variables.resourceGroupArtifactName }}
-        overrideParameters: -location $(pipeline#azure.location)
-                            -resourceGroupName ${{ variables.resourceGroupName }}
+        overrideParameters: -resourceGroupName ${{ variables.resourceGroupName }}
+                            -location $(pipeline#azure.location)
+                            -project ${{ variables.project }}
+    # Resources
+    - template: /pipeline/templates/bicep.buildandpublish.yaml
+      parameters:
+        azureResourceManagerConnection: $(pipeline#azure.subscription)
+        subscriptionId: $(pipeline#azure.subscription.id)
+        resourceGroupName: ${{ variables.resourceGroupName }}
+        location: $(pipeline#azure.location)
+        workingDirectory: ${{ variables.workingDirectory }}
+        artifactName: ${{ variables.resourceArtifactName }}
+        overrideParameters: -project ${{ variables.project }}
 
 - stage: Deploy
   displayName: Deployment
@@ -60,6 +76,18 @@ stages:
               location: $(pipeline#azure.location)
               file: $(Pipeline.Workspace)/${{ variables.resourceGroupArtifactName }}/${{ variables.resourceGroupArtifactName }}.json
               parameterFile: $(Pipeline.Workspace)/${{ variables.resourceGroupArtifactName }}/${{ variables.resourceGroupArtifactName }}.parameters.json
-              overrideParameters: -location $(pipeline#azure.location))
-                                  -resourceGroupName ${{ variables.resourceGroupName }}
+              overrideParameters: -resourceGroupName ${{ variables.resourceGroupName }}
+                                  -location $(pipeline#azure.location)
+                                  -project ${{ variables.project }}
+          # Resources      
+          - template: /pipeline/templates/azure.deployment.yaml
+            parameters:
+              resourceName: Resources
+              azureResourceManagerConnection: $(pipeline#azure.subscription)
+              subscriptionId: $(pipeline#azure.subscription.id)
+              resourceGroupName: ${{ variables.resourceGroupName }}
+              location: $(pipeline#azure.location)
+              file: $(Pipeline.Workspace)/${{ variables.resourceArtifactName }}/${{ variables.resourceArtifactName }}.json
+              parameterFile: $(Pipeline.Workspace)/${{ variables.resourceArtifactName }}/${{ variables.resourceArtifactName }}.parameters.json
+              overrideParameters: -project ${{ variables.project }}
                                   
