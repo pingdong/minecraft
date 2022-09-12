@@ -81,8 +81,8 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
           }
           environmentVariables: [
             { name: 'EULA', value: 'TRUE' }
-            { name: 'GAMEMODE', value: 'creative' }
-            { name: 'DIFFICULTY', value: 'peaceful' }
+            { name: 'GAMEMODE', value: '1' }
+            { name: 'DIFFICULTY', value: '0' }
           ]
           ports: [
             { port: 19132, protocol: 'UDP' }
