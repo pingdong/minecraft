@@ -159,22 +159,19 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
         }
       }
       actions: {
-        actionType: {
-          type: 'http'
+        'start_container': {
+          type: 'ApiConnection'
           inputs: {
-            'start_container': {
-              type: 'ApiConnection'
-              input: {
-                host: {
-                  connection: {
-                    name: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/aci'
-                  }
+            input: {
+              host: {
+                connection: {
+                  name: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/aci'
                 }
-                method: 'post'
-                path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
-                queries: {
-                  'x-ms-api-version': '2019-12-01'
-                }
+              }
+              method: 'post'
+              path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
+              queries: {
+                'x-ms-api-version': '2019-12-01'
               }
             }
           }
