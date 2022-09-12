@@ -160,9 +160,9 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
       }
       actions: {
         actionType: {
+          type: 'ApiConnection'
           inputs: {
             'start_container': {
-              type: 'ApiConnection'
               input: {
                 host: {
                   connection: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/aci'
