@@ -15,6 +15,7 @@ param location string
 @description('Default Resource Tags')
 param defaultTags object = {
   project: resourceGroupName
+  owner: 'Ping Dong'
 }
 
 // **********************
