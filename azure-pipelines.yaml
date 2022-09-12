@@ -24,7 +24,7 @@ stages:
       clean: all
     steps:
     # Resource Group
-    - template: /pipeline/templates/bicep.buildandpublish.yml
+    - template: /pipeline/templates/bicep.buildandpublish.yaml
       parameters:
         azureResourceManagerConnection: $(pipeline#azure.subscription)
         subscriptionId: $(pipeline#azure.subscription.id)
@@ -52,7 +52,7 @@ stages:
         deploy:
           steps:    
           # Resource Group      
-          - template: /pipeline/templates/azure.deployment.yml
+          - template: /pipeline/templates/azure.deployment.yaml
             parameters:
               resourceName: Resource Group
               azureResourceManagerConnection: $(pipeline#azure.subscription)
