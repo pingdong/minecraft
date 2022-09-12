@@ -7,6 +7,7 @@
 param project string
 
 param worlds array
+param settings array
 
 // Resource Related Parameters
 @minLength(3)
@@ -58,5 +59,56 @@ resource fileshare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-0
   properties: {
     shareQuota: 1024
     accessTier: 'Hot'
+  }
+}]
+
+// Container Instance
+resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for world in worlds: {
+  name: 'aci-minecraft-${world}'
+  location: location
+  tags: defaultTags
+
+  dependsOn: fileshare
+
+  properties: {
+    containers: [
+      {
+        name: '${world}'
+        properties: {
+          image: 'itzg/minecraft-bedrock-server:latest'
+          resources: {
+            requests: { cpu: 1, memoryInGB: 2 }
+          }
+          environmentVariables: [
+            { name: 'EULA', value: 'true' }
+          ]
+          ports: [
+            { port: 19132, protocol: 'UDP' }
+          ]
+          volumeMounts: [
+            { name: 'datavolume', mountPath: '/data' }
+          ]
+        }
+      }
+    ]
+    restartPolicy: 'OnFailure'
+    osType: 'Linux'
+    ipAddress: {
+      type: 'Public'
+      ports: [
+        { port: 19132, protocol: 'UDP' }
+      ]
+      dnsNameLabel: 'mcs-${world}'
+    }
+    volumes: [
+      {
+        name: 'datavolume'
+        azureFile: {
+          shareName: '${world}'
+          storageAccountName: sa.name
+          storageAccountKey: sa.listKeys().keys[0].value
+        }
+      }
+    ]
   }
 }]
