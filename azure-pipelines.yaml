@@ -1,0 +1,65 @@
+trigger: none
+pr: none
+
+variables:
+- group: Minecraft
+
+- name: resourceGroupArtifactName
+  value: resourceGroup
+- name: resourceGroupName
+  value: minecraft
+
+stages:
+- stage: Build
+  displayName: Transpile
+  variables:
+  - name: workingDirectory
+    value: ./bicep
+  jobs:
+  - job: Transpile
+    displayName: Transpile Template
+    pool:
+      vmImage: $(pipeline#vmImage)
+    workspace:
+      clean: all
+    steps:
+    # Resource Group
+    - template: /pipeline/templates/bicep.buildandpublish.yml
+      parameters:
+        azureResourceManagerConnection: $(pipeline#azure.subscription)
+        subscriptionId: $(pipeline#azure.subscription.id)
+        location: $(pipeline#azure.location)
+        workingDirectory: ${{ variables.workingDirectory }}
+        artifactName: ${{ variables.resourceGroupArtifactName }}
+        overrideParameters: -location $(pipeline#azure.location)
+                            -resourceGroupName ${{ variables.resourceGroupName }}
+
+- stage: Deploy
+  displayName: Deployment
+  dependsOn: Build
+  condition: succeeded()
+  variables:
+  - name: environment
+    value: minecraft
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: ${{ variables.environment }}
+    pool:
+      vmImage: $(pipeline#vmImage)
+    strategy:
+      runOnce:
+        deploy:
+          steps:    
+          # Resource Group      
+          - template: /pipeline/templates/azure.deployment.yml
+            parameters:
+              resourceName: Resource Group
+              azureResourceManagerConnection: $(pipeline#azure.subscription)
+              subscriptionId: $(pipeline#azure.subscription.id)
+              location: $(pipeline#azure.location)
+              file: $(Pipeline.Workspace)/${{ variables.resourceGroupArtifactName }}/${{ variables.resourceGroupArtifactName }}.json
+              parameterFile: $(Pipeline.Workspace)/${{ variables.resourceGroupArtifactName }}/${{ variables.resourceGroupArtifactName }}.parameters.json
+              overrideParameters: -location $(pipeline#azure.location))
+                                  -resourceGroupName ${{ variables.resourceGroupName }}
+                                  

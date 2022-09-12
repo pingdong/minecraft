@@ -1,0 +1,61 @@
+parameters:
+- name: resourceName
+  type: string
+- name: azureResourceManagerConnection
+  type: string
+- name: subscriptionId
+  type: string
+  default: ''
+- name: location
+  type: string
+- name: resourceGroupName
+  type: string
+  default: ''
+- name: file
+  type: string
+- name: parameterFile
+  type: string
+- name: overrideParameters
+  type: string
+  default: ''
+- name: outputToEnvironement
+  type: boolean
+  default: false
+
+steps:
+# Deploy to Subscription
+- ${{ if eq(parameters.resourceGroupName, '') }}:
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: Provision ${{ parameters.resourceName }}
+    inputs:
+      deploymentScope: Subscription
+      deploymentMode: Incremental
+      deploymentOutputs: output
+      azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
+      subscriptionId: ${{ parameters.subscriptionId }}
+      location: ${{ parameters.location }}
+      csmFile: ${{ parameters.file }}
+      csmParametersFile: ${{ parameters.parameterFile }}
+      overrideParameters: ${{ parameters.overrideParameters }}
+
+# Deploy to Resource Group
+- ${{ if ne(parameters.resourceGroupName, '') }}:
+  - task: AzureResourceManagerTemplateDeployment@3
+    displayName: Provision ${{ parameters.resourceName }}
+    inputs:
+      deploymentMode: Incremental
+      deploymentOutputs: output
+      azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
+      subscriptionId: ${{ parameters.subscriptionId }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      location: ${{ parameters.location }}
+      csmFile: ${{ parameters.file }}
+      csmParametersFile: ${{ parameters.parameterFile }}
+      overrideParameters: ${{ parameters.overrideParameters }}
+
+  - ${{ if parameters.outputToEnvironement }}:
+    - task: ARM Outputs@6
+      displayName: Processing Output
+      inputs:
+        ConnectedServiceNameARM: ${{ parameters.azureResourceManagerConnection }}
+        resourceGroupName: ${{ parameters.resourceGroupName }}

@@ -1,0 +1,70 @@
+parameters:
+- name: azureResourceManagerConnection
+  type: string
+- name: subscriptionId
+  type: string
+  default: ''
+- name: location
+  type: string
+- name: resourceGroupName
+  type: string
+  default: ''
+- name: workingDirectory
+  type: string
+- name: artifactName
+  type: string
+- name: overrideParameters
+  type: string
+  default: ''
+
+steps:
+  - task: AzureCLI@2
+    displayName: '[${{ parameters.artifactName }}] Transpile to ARM Template from bicep file'
+    inputs:
+      azureSubscription: ${{ parameters.azureResourceManagerConnection }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az --version
+        az bicep build --file ${{ format('{0}/{1}.bicep', parameters.workingDirectory, parameters.artifactName) }} --outfile ${{ format('{0}/{1}.json', parameters.workingDirectory, parameters.artifactName) }}
+
+  - ${{ if eq(parameters.resourceGroupName, '') }}:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: '[${{ parameters.artifactName }}] Validate the Template, Scope: Subscription'
+      inputs:
+        deploymentScope: Subscription
+        deploymentMode: Validation
+        azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
+        subscriptionId: ${{ parameters.subscriptionId }}
+        location: ${{ parameters.location }}
+        csmFile: ${{ format('{0}/{1}.json', parameters.workingDirectory, parameters.artifactName) }}
+        csmParametersFile: ${{ format('{0}/{1}.parameters.json', parameters.workingDirectory, parameters.artifactName) }}
+        overrideParameters: ${{ parameters.overrideParameters }}
+
+  - ${{ if ne(parameters.resourceGroupName, '') }}:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: '[${{ parameters.artifactName }}] Validate the Template, Scope: Resource Group'
+      inputs:
+        deploymentScope: Resource Group 
+        deploymentMode: Validation
+        azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
+        subscriptionId: ${{ parameters.subscriptionId }}
+        resourceGroupName: ${{ parameters.resourceGroupName }}
+        location: ${{ parameters.location }}
+        csmFile: ${{ format('{0}/{1}.json', parameters.workingDirectory, parameters.artifactName) }}
+        csmParametersFile: ${{ format('{0}/{1}.parameters.json', parameters.workingDirectory, parameters.artifactName) }}
+        overrideParameters: ${{ parameters.overrideParameters }}
+
+  - task: CopyFiles@2
+    displayName: '[${{ parameters.artifactName }}] Copy the Template'
+    inputs:
+      SourceFolder: ${{ parameters.workingDirectory }}
+      contents: ${{ format('**/{0}*.json', parameters.artifactName) }}
+      TargetFolder: '$(build.artifactstagingdirectory)'
+      cleanTargetFolder: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: ${{ format('[{0}] Publish Artifact - {0}', parameters.artifactName) }}
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)'
+      ArtifactName: ${{ format('{0}', parameters.artifactName) }}
