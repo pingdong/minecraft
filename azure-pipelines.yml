@@ -2,7 +2,7 @@ trigger: none
 pr: none
 
 variables:
-- group: Pipeline
+- group: Minecraft
 
 stages:
 # Management Resource
@@ -23,5 +23,5 @@ stages:
         connectedServiceName: $(pipeline#azure.subscription)
         subscriptionId: $(pipeline#azure.subscription.id)
         location: $(pipeline#azure.location)
-        csmFile: azuredeploy.json
-        csmParametersFile: azuredeploy.parameters.json
+        csmFile: arm\azuredeploy.json
+        csmParametersFile: arm\azuredeploy.parameters.json

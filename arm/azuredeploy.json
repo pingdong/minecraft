@@ -6,7 +6,7 @@
         "tags": {
             "type": "object",
             "defaultValue": { 
-                "owner": "Ping",
+                "owner": "Ping Dong",
                 "app": "Minecraft Bedrock" 
             }
         },
@@ -183,7 +183,7 @@
                         // Storage Account
                         {
                             "type": "Microsoft.Storage/storageAccounts",
-                            "apiVersion": "2019-06-01",
+                            "apiVersion": "2019-0-01",
                             "name": "[parameters('storageAccount_name')]",
                             "location": "[resourceGroup().location]",
                             "tags": "[parameters('tags')]",
