@@ -80,7 +80,7 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
             requests: { cpu: 1, memoryInGB: 2 }
           }
           environmentVariables: [
-            { name: 'EULA', value: 'true' }
+            { name: 'EULA', value: 'TRUE' }
             { name: 'VERSION', value: 'LATEST' }
             { name: 'GAMEMODE', value: 'creative' }
             { name: 'DIFFICULTY', value: 'peaceful' }
