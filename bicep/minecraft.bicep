@@ -6,6 +6,7 @@
 @minLength(3)
 param project string
 
+@description('Minecraft worlds')
 param worlds array
 
 // Resource Related Parameters
