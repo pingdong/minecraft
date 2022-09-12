@@ -114,3 +114,13 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
     ]
   }
 }]
+
+// API Connection
+resource api 'Microsoft.Web/connections@2016-06-01' = {
+  name: 'aci'
+  location: location
+  
+  properties: {
+    displayName: 'Azure Container Instance'
+  }
+}
