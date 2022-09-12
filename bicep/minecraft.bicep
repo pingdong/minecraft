@@ -122,5 +122,8 @@ resource api 'Microsoft.Web/connections@2016-06-01' = {
   
   properties: {
     displayName: 'Azure Container Instance'
+    api: {
+      id: 'subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/aci'
+    }
   }
 }
