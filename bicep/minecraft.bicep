@@ -172,7 +172,7 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = {
           inputs: {
             host: {
               connection: {
-                name: '@parameters.connectionId'
+                name: '@parameters(connectionId)'
               }
             }
             method: 'post'
