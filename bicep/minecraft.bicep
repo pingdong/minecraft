@@ -143,13 +143,6 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = {
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
-
-      parameters: {
-        connectionId: {
-          type: 'string'
-        }
-      }
-
       triggers: {
         recurrence: {
           type: 'Recurrence'
@@ -165,27 +158,25 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = {
           }
         }
       }
-
       actions: [for world in worlds: {
         'start_container': {
-          type: 'ApiConnection'
+          type: 'Http'
           inputs: {
-            host: {
-              connection: {
-                name: '@parameters(connectionId)'
+            input: {
+              host: {
+                connection: {
+                  name: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/aci'
+                }
               }
-            }
-            method: 'post'
-            path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
-            queries: {
-              'x-ms-api-version': '2019-12-01'
+              method: 'post'
+              path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
+              queries: {
+                'x-ms-api-version': '2019-12-01'
+              }
             }
           }
         }
       }]
-    }
-    parameters: {
-      connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${api.name}'
     }
   }
 }
