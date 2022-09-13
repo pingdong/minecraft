@@ -129,7 +129,7 @@ resource api 'Microsoft.Web/connections@2016-06-01' = {
 }
 
 // Logic App
-resource la 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
+resource la 'Microsoft.Logic/workflows@2019-05-01' = {
   name: 'la-minecraft-start'
   location: location
   tags: defaultTags
@@ -143,6 +143,13 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
+
+      parameters: {
+        connectionId: {
+          type: 'string'
+        }
+      }
+
       triggers: {
         recurrence: {
           type: 'Recurrence'
@@ -158,25 +165,27 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
           }
         }
       }
-      actions: {
+
+      actions: [for world in worlds: {
         'start_container': {
           type: 'ApiConnection'
           inputs: {
-            input: {
-              host: {
-                connection: {
-                  name: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/aci'
-                }
+            host: {
+              connection: {
+                name: '@parameters.connectionId'
               }
-              method: 'post'
-              path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
-              queries: {
-                'x-ms-api-version': '2019-12-01'
-              }
+            }
+            method: 'post'
+            path: '/subscriptions/${subscription().id}/resourceGroups/${resourceGroup().name}/providers/Microsoft.ContainerInstance/containerGroups/${world}/start'
+            queries: {
+              'x-ms-api-version': '2019-12-01'
             }
           }
         }
-      }
+      }]
+    }
+    parameters: {
+      connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${api.name}'
     }
   }
-}]
+}
