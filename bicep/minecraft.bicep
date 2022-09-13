@@ -116,26 +116,26 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
 }]
 
 // API Connection
-resource api 'Microsoft.Web/connections@2016-06-01' = {
+resource aci 'Microsoft.Web/connections@2016-06-01' = {
   name: 'aci'
   location: location
   
   properties: {
     displayName: 'Azure Container Instance'
     api: {
-      id: '${subscription().id}/providers/Microsoft.Web/locations/${location}/managedApis/aci'
+      id: '/subscriptions/${subscription().id}/providers/Microsoft.Web/locations/${location}/managedApis/aci'
     }
   }
 }
 
 // Logic App
-resource la 'Microsoft.Logic/workflows@2019-05-01' = {
+resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
   name: 'la-minecraft-start'
   location: location
   tags: defaultTags
 
   dependsOn: [
-    api
+    aci
   ]
 
   properties: {
@@ -158,7 +158,41 @@ resource la 'Microsoft.Logic/workflows@2019-05-01' = {
           }
         }
       }
-      
+
+    }
+  }
+}
+
+resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
+  name: 'la-minecraft-stop'
+  location: location
+  tags: defaultTags
+
+  dependsOn: [
+    aci
+  ]
+
+  properties: {
+    state: 'Enabled'
+    definition: {
+      '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
+      contentVersion: '1.0.0.0'
+      triggers: {
+        recurrence: {
+          type: 'Recurrence'
+          recurrence: {
+            frequency: 'Day'
+            interval: 1
+            schedule: {
+              hours: [
+                '21'
+              ]
+            }
+            timeZone: 'New Zealand Standard Time'
+          }
+        }
+      }
+
     }
   }
 }
