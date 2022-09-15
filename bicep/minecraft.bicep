@@ -19,6 +19,11 @@ param defaultTags object = {
   owner: 'Ping Dong'
 }
 
+param aciPrefix string = 'aci-minecraft-'
+param aciDNSPrefix string = 'mcs-'
+
+param apiName string = 'api'
+
 // **********************
 // *     Resources      *
 // **********************
@@ -63,8 +68,8 @@ resource fileshare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-0
 }]
 
 // Container Instance
-resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for world in worlds: {
-  name: 'aci-minecraft-${world}'
+resource aci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for world in worlds: {
+  name: '${aciPrefix}${world}'
   location: location
   tags: defaultTags
 
@@ -77,7 +82,7 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
         properties: {
           image: 'itzg/minecraft-bedrock-server:latest'
           resources: {
-            requests: { cpu: 1, memoryInGB: 2 }
+            requests: { cpu: 1, memoryInGB: 1 }
           }
           environmentVariables: [
             { name: 'EULA', value: 'TRUE' }
@@ -100,7 +105,7 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
       ports: [
         { port: 19132, protocol: 'UDP' }
       ]
-      dnsNameLabel: 'mcs-${world}'
+      dnsNameLabel: '${aciDNSPrefix}${world}'
     }
     volumes: [
       {
@@ -116,14 +121,27 @@ resource ci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for worl
 }]
 
 // API Connection
-resource aci 'Microsoft.Web/connections@2016-06-01' = {
-  name: 'aci'
+resource api 'Microsoft.Web/connections@2016-06-01' = {
+  name: apiName
   location: location
+  kind: 'V1'
   
   properties: {
     displayName: 'Azure Container Instance'
+    statuses: [
+      {
+        status: 'Connected'
+      }
+    ]
+    nonSecretParameterValues: {
+      'token:TenantId': subscription().tenantId
+      'token:grantType': 'code'
+    }
     api: {
-      id: '${subscription().id}/providers/Microsoft.Web/locations/${location}/managedApis/aci'
+      name: apiName
+      displayName: 'Azure Resource Manager'
+      id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${apiName}'
+      type: 'Microsoft.Web/locations/managedApis'
     }
   }
 }
@@ -134,18 +152,20 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
   location: location
   tags: defaultTags
 
-  dependsOn: [
-    aci
-  ]
-
   properties: {
     state: 'Enabled'
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
+      parameters: {
+        '$connections': {
+          defaultValue: {
+          }
+          type: 'Object'
+        }
+      }
       triggers: {
         recurrence: {
-          type: 'Recurrence'
           recurrence: {
             frequency: 'Day'
             interval: 1
@@ -156,9 +176,39 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
             }
             timeZone: 'New Zealand Standard Time'
           }
+          type: 'Recurrence'
         }
       }
-
+      actions: [for world in worlds: {
+        Invoke_resource_operation: {
+          runAfter: {
+          }
+          type: 'ApiConnection'
+          inputs: {
+            host: {
+              connection: {
+                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
+              }
+            }
+            method: 'post'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'start\')}'
+            queries: {
+              'x-ms-api-version': '2019-12-01'
+            }
+          }
+        }
+      }]
+    }
+    parameters: {
+      '$connections': {
+        value: {
+          arm: {
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${apiName}'
+            connectionName: 'arm'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${apiName}'
+          }
+        }
+      }
     }
   }
 }
@@ -168,31 +218,63 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
   location: location
   tags: defaultTags
 
-  dependsOn: [
-    aci
-  ]
-
   properties: {
     state: 'Enabled'
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
+      parameters: {
+        '$connections': {
+          defaultValue: {
+          }
+          type: 'Object'
+        }
+      }
       triggers: {
         recurrence: {
-          type: 'Recurrence'
           recurrence: {
             frequency: 'Day'
             interval: 1
             schedule: {
               hours: [
-                '21'
+                '16'
               ]
             }
             timeZone: 'New Zealand Standard Time'
           }
+          type: 'Recurrence'
         }
       }
-
+      actions: [for world in worlds: {
+        Invoke_resource_operation: {
+          runAfter: {
+          }
+          type: 'ApiConnection'
+          inputs: {
+            host: {
+              connection: {
+                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
+              }
+            }
+            method: 'post'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'stop\')}'
+            queries: {
+              'x-ms-api-version': '2019-12-01'
+            }
+          }
+        }
+      }]
+    }
+    parameters: {
+      '$connections': {
+        value: {
+          arm: {
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${apiName}'
+            connectionName: 'arm'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${apiName}'
+          }
+        }
+      }
     }
   }
 }
