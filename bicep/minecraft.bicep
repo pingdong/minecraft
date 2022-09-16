@@ -131,10 +131,6 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
         status: 'Connected'
       }
     ]
-    nonSecretParameterValues: {
-      'token:TenantId': subscription().tenantId
-      'token:grantType': 'code'
-    }
     api: {
       name: 'arm'
       displayName: 'Azure Resource Manager'
