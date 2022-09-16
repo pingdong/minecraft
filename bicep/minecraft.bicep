@@ -156,10 +156,8 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
       parameters: {
-        '$connections': {
-          defaultValue: {
-          }
-          type: 'Object'
+        'connectionId': {
+          type: 'string'
         }
       }
       triggers: {
@@ -185,7 +183,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
           inputs: {
             host: {
               connection: {
-                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
+                name: '@parameters(\'connectionId\')'
               }
             }
             method: 'post'
@@ -198,15 +196,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
       }]
     }
     parameters: {
-      '$connections': {
-        value: {
-          arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
-            connectionName: 'arm'
-            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
-          }
-        }
-      }
+      'connectionId': '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
     }
   }
 }
@@ -222,10 +212,8 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
       parameters: {
-        '$connections': {
-          defaultValue: {
-          }
-          type: 'Object'
+        'connectionId': {
+          type: 'string'
         }
       }
       triggers: {
@@ -251,7 +239,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
           inputs: {
             host: {
               connection: {
-                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
+                name: '@parameters(\'connectionId\')'
               }
             }
             method: 'post'
@@ -264,15 +252,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
       }]
     }
     parameters: {
-      '$connections': {
-        value: {
-          arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
-            connectionName: 'arm'
-            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
-          }
-        }
-      }
+      'connectionId': '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
     }
   }
 }
