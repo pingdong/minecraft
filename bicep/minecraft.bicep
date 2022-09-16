@@ -22,8 +22,6 @@ param defaultTags object = {
 param aciPrefix string = 'aci-minecraft-'
 param aciDNSPrefix string = 'mcs-'
 
-param armName string = 'arm'
-
 // **********************
 // *     Resources      *
 // **********************
@@ -122,7 +120,7 @@ resource aci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for wor
 
 // API Connection
 resource arm 'Microsoft.Web/connections@2016-06-01' = {
-  name: armName
+  name: 'arm'
   location: location
   kind: 'V1'
   
@@ -138,9 +136,9 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
       'token:grantType': 'code'
     }
     api: {
-      name: armName
+      name: 'arm'
       displayName: 'Azure Resource Manager'
-      id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${armName}'
+      id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
       type: 'Microsoft.Web/locations/managedApis'
     }
   }
@@ -203,9 +201,9 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
       '$connections': {
         value: {
           arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${armName}'
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
             connectionName: 'arm'
-            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${armName}'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
           }
         }
       }
@@ -269,9 +267,9 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
       '$connections': {
         value: {
           arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/${armName}'
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
             connectionName: 'arm'
-            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/${armName}'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
           }
         }
       }
