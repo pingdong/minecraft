@@ -145,8 +145,8 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
 }
 
 // Logic App
-resource la_start 'Microsoft.Logic/workflows@2017-07-01' = {
-  name: 'la-minecraft-start'
+resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
+  name: 'la-${world}-start'
   location: location
   tags: defaultTags
 
@@ -156,8 +156,10 @@ resource la_start 'Microsoft.Logic/workflows@2017-07-01' = {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
       parameters: {
-        'connectionId': {
-          type: 'string'
+        '$connections': {
+          defaultValue: {
+          }
+          type: 'Object'
         }
       }
       triggers: {
@@ -175,7 +177,7 @@ resource la_start 'Microsoft.Logic/workflows@2017-07-01' = {
           type: 'Recurrence'
         }
       }
-      actions: [for world in worlds: {
+      actions: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -183,7 +185,7 @@ resource la_start 'Microsoft.Logic/workflows@2017-07-01' = {
           inputs: {
             host: {
               connection: {
-                name: '@parameters(\'connectionId\')'
+                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
               }
             }
             method: 'post'
@@ -193,16 +195,24 @@ resource la_start 'Microsoft.Logic/workflows@2017-07-01' = {
             }
           }
         }
-      }]
+      }
     }
     parameters: {
-      'connectionId': '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+      '$connections': {
+        value: {
+          arm: {
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+            connectionName: 'arm'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
+          }
+        }
+      }
     }
   }
-}
+}]
 
-resource la_stop 'Microsoft.Logic/workflows@2017-07-01' = {
-  name: 'la-minecraft-stop'
+resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
+  name: 'la-${world}-stop'
   location: location
   tags: defaultTags
 
@@ -212,8 +222,10 @@ resource la_stop 'Microsoft.Logic/workflows@2017-07-01' = {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
       parameters: {
-        'connectionId': {
-          type: 'string'
+        '$connections': {
+          defaultValue: {
+          }
+          type: 'Object'
         }
       }
       triggers: {
@@ -231,7 +243,7 @@ resource la_stop 'Microsoft.Logic/workflows@2017-07-01' = {
           type: 'Recurrence'
         }
       }
-      actions: [for world in worlds: {
+      actions: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -239,7 +251,7 @@ resource la_stop 'Microsoft.Logic/workflows@2017-07-01' = {
           inputs: {
             host: {
               connection: {
-                name: '@parameters(\'connectionId\')'
+                name: '@parameters(\'$connections\')[\'arm\'][\'connectionId\']'
               }
             }
             method: 'post'
@@ -249,10 +261,18 @@ resource la_stop 'Microsoft.Logic/workflows@2017-07-01' = {
             }
           }
         }
-      }]
+      }
     }
     parameters: {
-      'connectionId': '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+      '$connections': {
+        value: {
+          arm: {
+            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+            connectionName: 'arm'
+            id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
+          }
+        }
+      }
     }
   }
-}
+}]
