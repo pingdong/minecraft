@@ -179,7 +179,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
           type: 'Recurrence'
         }
       }
-      actions: [for world in worlds: {
+      actions: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -191,13 +191,13 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
               }
             }
             method: 'post'
-            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'start\')}'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}rainbowslide\')}/@{encodeURIComponent(\'start\')}'
             queries: {
               'x-ms-api-version': '2019-12-01'
             }
           }
         }
-      }]
+      }
     }
     parameters: {
       '$connections': {
@@ -245,7 +245,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
           type: 'Recurrence'
         }
       }
-      actions: [for world in worlds: {
+      actions: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -257,13 +257,13 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
               }
             }
             method: 'post'
-            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'stop\')}'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}rainbowslide\')}/@{encodeURIComponent(\'stop\')}'
             queries: {
               'x-ms-api-version': '2019-12-01'
             }
           }
         }
-      }]
+      }
     }
     parameters: {
       '$connections': {
