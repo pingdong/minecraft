@@ -145,8 +145,8 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
 }
 
 // Logic App
-resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
-  name: 'la-${world}-start'
+resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
+  name: 'la-minecraft-start'
   location: location
   tags: defaultTags
 
@@ -177,7 +177,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
           type: 'Recurrence'
         }
       }
-      actions: {
+      actions: [for world in worlds: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -195,7 +195,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
             }
           }
         }
-      }
+      }]
     }
     parameters: {
       '$connections': {
@@ -209,10 +209,10 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
       }
     }
   }
-}]
+}
 
-resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
-  name: 'la-${world}-stop'
+resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
+  name: 'la-minecraft-stop'
   location: location
   tags: defaultTags
 
@@ -243,7 +243,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
           type: 'Recurrence'
         }
       }
-      actions: {
+      actions: [for world in worlds: {
         Invoke_resource_operation: {
           runAfter: {
           }
@@ -261,7 +261,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
             }
           }
         }
-      }
+      }]
     }
     parameters: {
       '$connections': {
@@ -275,4 +275,4 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
       }
     }
   }
-}]
+}
