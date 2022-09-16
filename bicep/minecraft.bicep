@@ -145,8 +145,8 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
 }
 
 // Logic App
-resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
-  name: 'la-minecraft-start'
+resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
+  name: 'la-${world}-start'
   location: location
   tags: defaultTags
 
@@ -189,7 +189,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
               }
             }
             method: 'post'
-            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}rainbowslide\')}/@{encodeURIComponent(\'start\')}'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'start\')}'
             queries: {
               'x-ms-api-version': '2019-12-01'
             }
@@ -209,10 +209,10 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = {
       }
     }
   }
-}
+}]
 
-resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
-  name: 'la-minecraft-stop'
+resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: {
+  name: 'la-${world}-stop'
   location: location
   tags: defaultTags
 
@@ -255,7 +255,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = {
               }
             }
             method: 'post'
-            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}rainbowslide\')}/@{encodeURIComponent(\'stop\')}'
+            path: '/subscriptions/@{encodeURIComponent(\'${subscription().subscriptionId}\')}/resourcegroups/@{encodeURIComponent(\'${resourceGroup().name}\')}/providers/@{encodeURIComponent(\'Microsoft.ContainerInstance\')}/@{encodeURIComponent(\'containerGroups/${aciPrefix}${world}\')}/@{encodeURIComponent(\'stop\')}'
             queries: {
               'x-ms-api-version': '2019-12-01'
             }
