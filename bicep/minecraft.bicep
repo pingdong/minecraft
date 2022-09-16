@@ -82,7 +82,7 @@ resource aci 'Microsoft.ContainerInstance/containerGroups@2021-10-01' = [for wor
         properties: {
           image: 'itzg/minecraft-bedrock-server:latest'
           resources: {
-            requests: { cpu: 1, memoryInGB: 1 }
+            requests: { cpu: 1, memoryInGB: 2 }
           }
           environmentVariables: [
             { name: 'EULA', value: 'TRUE' }
