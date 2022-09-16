@@ -150,6 +150,10 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
   location: location
   tags: defaultTags
 
+  dependsOn: [
+    arm
+  ]
+
   properties: {
     state: 'Enabled'
     definition: {
@@ -215,6 +219,10 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
   name: 'la-${world}-stop'
   location: location
   tags: defaultTags
+
+  dependsOn: [
+    arm
+  ]
 
   properties: {
     state: 'Enabled'
