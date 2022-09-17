@@ -125,12 +125,16 @@ resource arm 'Microsoft.Web/connections@2016-06-01' = {
   kind: 'V1'
   
   properties: {
-    displayName: 'Azure Container Instance'
+    displayName: 'Azure Resource Manager'
     statuses: [
       {
         status: 'Connected'
       }
     ]
+    nonSecretParameterValues: {
+      'token:TenantId': 'b758b4c7-35d4-4b8c-85f1-000a417da601'
+      'token:grantType': 'code'
+    }
     api: {
       name: 'arm'
       displayName: 'Azure Resource Manager'
@@ -146,10 +150,6 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
   location: location
   tags: defaultTags
 
-  dependsOn: [
-    arm
-  ]
-
   properties: {
     state: 'Enabled'
     definition: {
@@ -163,7 +163,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
         }
       }
       triggers: {
-        recurrence: {
+        Recurrence: {
           recurrence: {
             frequency: 'Day'
             interval: 1
@@ -201,7 +201,7 @@ resource la_start 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds:
       '$connections': {
         value: {
           arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+            connectionId: arm.id
             connectionName: 'arm'
             id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
           }
@@ -216,10 +216,6 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
   location: location
   tags: defaultTags
 
-  dependsOn: [
-    arm
-  ]
-
   properties: {
     state: 'Enabled'
     definition: {
@@ -233,7 +229,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
         }
       }
       triggers: {
-        recurrence: {
+        Recurrence: {
           recurrence: {
             frequency: 'Day'
             interval: 1
@@ -271,7 +267,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
       '$connections': {
         value: {
           arm: {
-            connectionId: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}/providers/Microsoft.Web/connections/arm'
+            connectionId: arm.id
             connectionName: 'arm'
             id: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/arm'
           }
