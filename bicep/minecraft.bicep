@@ -235,7 +235,7 @@ resource la_stop 'Microsoft.Logic/workflows@2019-05-01' = [for world in worlds: 
             interval: 1
             schedule: {
               hours: [
-                '16'
+                '21'
               ]
             }
             timeZone: 'New Zealand Standard Time'
